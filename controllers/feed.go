@@ -17,7 +17,7 @@ func GetFeeds(c *gin.Context) {
 	var feeds []models.Feed
 	// Preload User, Comments, dan Reactions agar data terkait ikut ter-fetch.
 	if err := config.DB.Preload("User").
-		Preload("Comments").
+		Preload("Comments.User").
 		Preload("Reactions").
 		Order("created_at desc").
 		Find(&feeds).Error; err != nil {
