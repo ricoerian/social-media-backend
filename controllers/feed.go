@@ -238,6 +238,12 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 
+	// Preload data User untuk memasukkan data user yang membuat komentar
+	if err := config.DB.Preload("User").First(&comment, comment.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{"comment": comment})
 }
 
