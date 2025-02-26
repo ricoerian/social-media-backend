@@ -13,7 +13,7 @@ var DB *gorm.DB
 
 func ConnectDatabase() {
     // Ganti dengan DSN sesuai konfigurasi database kamu.
-    dsn := "root:yGkRgDaPonzbtJhrADzRiysVojCLLuTW@mysql.railway.internal/railway?charset=utf8mb4&parseTime=True&loc=Local"
+    dsn := "root:yGkRgDaPonzbtJhrADzRiysVojCLLuTW@tcp(mysql.railway.internal:3306)/railway?charset=utf8mb4&parseTime=True&loc=Local"
     database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
     if err != nil {
         log.Fatal("Gagal terhubung ke database:", err)
