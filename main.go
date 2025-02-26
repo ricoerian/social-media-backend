@@ -17,7 +17,7 @@ func main() {
 
     // Konfigurasi CORS
     r.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"http://localhost:5173"}, // Sesuaikan dengan URL frontend kamu
+        AllowOrigins:     []string{"https://social-media-frontend-beryl-mu.vercel.app"}, // Sesuaikan dengan URL frontend kamu
         AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
         AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
         ExposeHeaders:    []string{"Content-Length"},
