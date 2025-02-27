@@ -13,13 +13,15 @@ import (
 	"social-media-backend/models"
 )
 
-var secretKey = []byte("your_secret_key") // Ganti dengan secret key yang aman.
+var secretKey = []byte("RahasiaGaSih") // Ganti dengan secret key yang aman.
 
 type RegisterInput struct {
-	Fullname string `json:"fullname" binding:"required"`
-	Username string `json:"username" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
+	Fullname     string `json:"fullname" binding:"required"`
+	Username     string `json:"username" binding:"required"`
+	Email        string `json:"email" binding:"required,email"`
+	Password     string `json:"password" binding:"required,min=6"`
+	JenisKelamin string `json:"jenis_kelamin" binding:"required"`
+	TanggalLahir string `json:"tanggal_lahir" binding:"required"` // format YYYY-MM-DD
 }
 
 type LoginInput struct {
@@ -43,22 +45,35 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	hashedPassword, err := HashPassword(input.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal meng-hash password"})
 		return
 	}
+
+	// Parse TanggalLahir dari string ke time.Time
+	parsedDate, err := time.Parse("2006-01-02", input.TanggalLahir)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Format tanggal lahir tidak valid, gunakan YYYY-MM-DD"})
+		return
+	}
+
 	user := models.User{
 		Fullname:     input.Fullname,
 		Username:     input.Username,
 		Email:        input.Email,
 		Password:     hashedPassword,
+		JenisKelamin: input.JenisKelamin,
+		TanggalLahir: &parsedDate,
 		PhotoProfile: "public/default/images/user.png",
 	}
+
 	if err := config.DB.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.JSON(http.StatusCreated, gin.H{"message": "Registrasi berhasil"})
 }
 
