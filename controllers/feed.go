@@ -247,6 +247,53 @@ func CreateComment(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"comment": comment})
 }
 
+// UpdateComment memungkinkan pengirim comment untuk mengedit komentarnya.
+func UpdateComment(c *gin.Context) {
+	currentUserInterface, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User tidak terautentikasi"})
+		return
+	}
+	currentUser := currentUserInterface.(models.User)
+
+	commentIDStr := c.Param("id")
+	commentID, err := strconv.ParseUint(commentIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID comment tidak valid"})
+		return
+	}
+
+	var comment models.Comment
+	if err := config.DB.First(&comment, uint(commentID)).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Comment tidak ditemukan"})
+		return
+	}
+
+	// Hanya pengirim komentar yang dapat mengedit komentarnya.
+	if comment.UserID != currentUser.ID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Anda tidak memiliki hak untuk mengedit comment ini"})
+		return
+	}
+
+	var input struct {
+		Comment string `json:"comment" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	comment.Comment = input.Comment
+	comment.UpdatedAt = time.Now()
+
+	if err := config.DB.Save(&comment).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Comment berhasil diupdate", "comment": comment})
+}
+
 // DeleteComment memungkinkan user menghapus comment yang dibuatnya.
 func DeleteComment(c *gin.Context) {
 	currentUserInterface, exists := c.Get("user")

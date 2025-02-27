@@ -52,6 +52,7 @@ func main() {
         authorized.PUT("/feeds/:feed_id", controllers.UpdateFeed)
         authorized.DELETE("/feeds/:feed_id", controllers.DeleteFeed)
         authorized.POST("/feeds/:feed_id/comments", controllers.CreateComment)
+        authorized.PUT("/comments/:id", controllers.UpdateComment)
         authorized.DELETE("/comments/:id", controllers.DeleteComment)
         authorized.POST("/feeds/:feed_id/like", controllers.LikeFeed)
         authorized.POST("/feeds/:feed_id/dislike", controllers.DislikeFeed)
